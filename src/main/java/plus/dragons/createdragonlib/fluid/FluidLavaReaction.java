@@ -23,4 +23,9 @@ public record FluidLavaReaction(BlockState withLava, BlockState withFlowingLava,
 		return REACTIONS.keySet().stream().anyMatch(variant -> variant.isOf(fluid.getSource())) ? REACTIONS.entrySet().stream().filter(p -> p.getKey().isOf(fluid.getSource())).findFirst().get().getValue() : null;
 	}
 
+	@Nullable
+	public static FluidLavaReaction get(FluidVariant fluid) {
+		return fluid.getFluid() instanceof FlowingFluid flow ? get(flow) : null;
+	}
+
 }
