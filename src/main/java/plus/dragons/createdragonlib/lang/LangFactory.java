@@ -1,13 +1,14 @@
 package plus.dragons.createdragonlib.lang;
 
-import com.google.gson.JsonObject;
-import com.simibubi.create.foundation.ponder.PonderLocalization;
-import net.minecraft.data.DataGenerator;
-import net.minecraftforge.data.event.GatherDataEvent;
-import plus.dragons.createdragonlib.advancement.AdvancementHolder;
-
 import java.util.Collections;
 import java.util.function.Supplier;
+
+import com.google.gson.JsonObject;
+import com.simibubi.create.foundation.ponder.PonderLocalization;
+import com.tterrag.registrate.fabric.GatherDataEvent;
+
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import plus.dragons.createdragonlib.advancement.AdvancementHolder;
 
 public class LangFactory {
     private final String modid;
@@ -26,10 +27,9 @@ public class LangFactory {
      * Register the {@link LangMerger} instance to {@link GatherDataEvent}. <br>
      * Should be called in the mod's main class' constructor. <br>
      */
-    public void datagen(final GatherDataEvent event) {
-        DataGenerator datagen = event.getGenerator();
+    public void datagen(final FabricDataGenerator datagen) {
         langMerger.dataGenerator = datagen;
-        datagen.addProvider(event.includeClient(), langMerger);
+        datagen.addProvider(langMerger);
     }
     
     /**

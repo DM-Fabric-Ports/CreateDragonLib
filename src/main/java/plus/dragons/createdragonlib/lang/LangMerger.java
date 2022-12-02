@@ -1,17 +1,23 @@
 package plus.dragons.createdragonlib.lang;
 
-import com.google.common.hash.Hashing;
-import com.google.common.hash.HashingOutputStream;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.simibubi.create.foundation.ponder.PonderScene;
-import com.simibubi.create.foundation.utility.FilesHelper;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DataProvider;
-import net.minecraft.util.GsonHelper;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -20,12 +26,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.Map.Entry;
+import com.google.common.hash.Hashing;
+import com.google.common.hash.HashingOutputStream;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.simibubi.create.foundation.ponder.PonderScene;
+import com.simibubi.create.foundation.utility.FilesHelper;
+
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.DataProvider;
+import net.minecraft.util.GsonHelper;
 
 /*
 MIT License
@@ -52,7 +65,8 @@ SOFTWARE.
 */
 
 /**
- * A useful {@link DataProvider} which can merge handwritten localization files and generated ones into one. <br>
+ * A useful {@link DataProvider} which can merge handwritten localization files
+ * and generated ones into one. <br>
  * Originated from {@link com.simibubi.create.foundation.data.LangMerger} <br>
  */
 @SuppressWarnings("UnstableApiUsage")
@@ -60,18 +74,18 @@ SOFTWARE.
 class LangMerger implements DataProvider {
 	private static final Logger LOGGER = LogManager.getLogger();
 	private static final Gson GSON = new GsonBuilder()
-		.setPrettyPrinting()
-		.disableHtmlEscaping()
-		.create();
+			.setPrettyPrinting()
+			.disableHtmlEscaping()
+			.create();
 	private static final String CATEGORY_HEADER = "\t\"_\": \"->------------------------]  %s  [------------------------<-\",";
 	private final String modid;
 	private final String name;
-	
+
 	private final List<Object> mergedLangData = new ArrayList<>();
 	private final Map<String, List<Object>> populatedLangData = new HashMap<>();
 	private final Map<String, Map<String, String>> allLocalizedEntries = new HashMap<>();
 	private final Map<String, MutableInt> missingTranslationTally = new HashMap<>();
-	
+
 	final List<LangPartial> partials = new ArrayList<>();
 	DataGenerator dataGenerator;
 	List<String> ignore = new ArrayList<>();
@@ -89,44 +103,44 @@ class LangMerger implements DataProvider {
 	@Override
 	public void run(CachedOutput cache) throws IOException {
 		Path path = this.dataGenerator.getOutputFolder()
-			.resolve("assets/" + modid + "/lang/" + "en_us.json");
-		
-		for(Pair<String, JsonElement> pair : getAllLocalizationFiles()) {
-			if(!pair.getRight().isJsonObject())
+				.resolve("assets/" + modid + "/lang/" + "en_us.json");
+
+		for (Pair<String, JsonElement> pair : getAllLocalizationFiles()) {
+			if (!pair.getRight().isJsonObject())
 				continue;
 			Map<String, String> localizedEntries = new HashMap<>();
 			JsonObject jsonObject = pair.getRight().getAsJsonObject();
 			jsonObject.entrySet()
-				.stream()
-				.forEachOrdered(entry -> {
-					String key = entry.getKey();
-					if(key.startsWith("_"))
-						return;
-					String value = entry.getValue()
-						.getAsString();
-					localizedEntries.put(key, value);
-				});
+					.stream()
+					.forEachOrdered(entry -> {
+						String key = entry.getKey();
+						if (key.startsWith("_"))
+							return;
+						String value = entry.getValue()
+								.getAsString();
+						localizedEntries.put(key, value);
+					});
 			String key = pair.getKey();
 			allLocalizedEntries.put(key, localizedEntries);
 			populatedLangData.put(key, new ArrayList<>());
 			missingTranslationTally.put(key, new MutableInt(0));
 		}
-		
+
 		collectExistingEntries(path);
 		collectEntries();
-		if(mergedLangData.isEmpty())
+		if (mergedLangData.isEmpty())
 			return;
-		
+
 		save(cache, mergedLangData, -1, path, "Merging en_us.json with hand-written lang entries...");
-		for(Entry<String, List<Object>> localization : populatedLangData.entrySet()) {
+		for (Entry<String, List<Object>> localization : populatedLangData.entrySet()) {
 			String key = localization.getKey();
 			Path populatedLangPath = this.dataGenerator.getOutputFolder()
-				.resolve("assets/" + modid + "/lang/unfinished/" + key);
+					.resolve("assets/" + modid + "/lang/unfinished/" + key);
 			save(cache, localization.getValue(), missingTranslationTally.get(key)
-				.intValue(), populatedLangPath, "Populating " + key + " with missing entries...");
+					.intValue(), populatedLangPath, "Populating " + key + " with missing entries...");
 		}
 	}
-	
+
 	private boolean shouldIgnore(String key) {
 		for (String string : ignore)
 			if (key.startsWith(string))
@@ -176,19 +190,19 @@ class LangMerger implements DataProvider {
 
 		MutableObject<String> previousKey = new MutableObject<>("");
 		jsonObject.entrySet()
-			.stream()
-			.forEachOrdered(entry -> {
-				String key = entry.getKey();
-				if (shouldIgnore(key))
-					return;
-				String value = entry.getValue()
-					.getAsString();
-				if (!previousKey.getValue()
-					.isEmpty() && shouldAddLineBreak(key, previousKey.getValue()))
-					writeData("\n");
-				writeEntry(key, value);
-				previousKey.setValue(key);
-			});
+				.stream()
+				.forEachOrdered(entry -> {
+					String key = entry.getKey();
+					if (shouldIgnore(key))
+						return;
+					String value = entry.getValue()
+							.getAsString();
+					if (!previousKey.getValue()
+							.isEmpty() && shouldAddLineBreak(key, previousKey.getValue()))
+						writeData("\n");
+					writeEntry(key, value);
+					previousKey.setValue(key);
+				});
 
 		writeData("\n");
 	}
@@ -196,7 +210,7 @@ class LangMerger implements DataProvider {
 	private void writeData(String data) {
 		mergedLangData.add(data);
 		populatedLangData.values()
-			.forEach(l -> l.add(data));
+				.forEach(l -> l.add(data));
 	}
 
 	private void writeEntry(String key, String value) {
@@ -205,7 +219,7 @@ class LangMerger implements DataProvider {
 			ForeignLangEntry entry = new ForeignLangEntry(key, value, allLocalizedEntries.get(k));
 			if (entry.isMissing())
 				missingTranslationTally.get(k)
-					.increment();
+						.increment();
 			l.add(entry);
 		});
 	}
@@ -253,7 +267,7 @@ class LangMerger implements DataProvider {
 	}
 
 	private void collectEntries() {
-		for (LangPartial partial : partials){
+		for (LangPartial partial : partials) {
 			addAll(partial.getDisplay(), partial.provide().getAsJsonObject());
 		}
 	}
