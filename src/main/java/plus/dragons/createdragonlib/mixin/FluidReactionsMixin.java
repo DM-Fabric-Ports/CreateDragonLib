@@ -22,6 +22,7 @@ import net.minecraft.world.level.material.Fluids;
 import plus.dragons.createdragonlib.fluid.FluidLavaReaction;
 
 @Mixin(value = FluidReactions.class, remap = false)
+@SuppressWarnings("UnstableApiUsage")
 public class FluidReactionsMixin {
 
     @Inject(method = "handlePipeFlowCollision", at = @At("HEAD"), cancellable = true)

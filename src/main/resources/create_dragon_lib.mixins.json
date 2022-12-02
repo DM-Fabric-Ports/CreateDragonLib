@@ -9,7 +9,9 @@
     "CreateAdvancementConstructor",
     "CreateAdvancementMixin",
     "CreateItemGroupBaseMixin",
-    "FluidReactionsMixin"
+    "FluidReactionsMixin",
+    "LavaFluidMixin",
+    "LiquidBlockMixin"
   ],
   "client": [],
   "injectors": {
