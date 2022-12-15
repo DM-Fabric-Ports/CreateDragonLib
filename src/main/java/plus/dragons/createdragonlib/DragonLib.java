@@ -2,6 +2,7 @@ package plus.dragons.createdragonlib;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import plus.dragons.createdragonlib.tag.TagGen;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;

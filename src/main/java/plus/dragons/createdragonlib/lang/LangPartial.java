@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.simibubi.create.foundation.utility.FilesHelper;
 
+import java.util.function.Supplier;
+
 abstract class LangPartial {
     protected final String modid;
     protected final String display;
