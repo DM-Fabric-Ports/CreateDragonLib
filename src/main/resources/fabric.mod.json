@@ -8,7 +8,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["plus.dragons.createdragonlib.DragonLib"]
+    "main": ["plus.dragons.createdragonlib.DragonLib"],
+    "fabric-datagen": ["plus.dragons.createdragonlib.DragonLib"]
   },
   "mixins": ["create_dragon_lib.mixins.json"],
   "depends": {

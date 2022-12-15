@@ -6,8 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.simibubi.create.foundation.utility.FilesHelper;
 
-import java.util.function.Supplier;
-
 abstract class LangPartial {
     protected final String modid;
     protected final String display;
@@ -30,7 +28,7 @@ abstract class LangPartial {
             super(modid, display);
             this.filename = filename;
         }
-    
+
         @Override
         public JsonObject provide() {
             String filepath = "assets/" + modid + "/lang/default/" + filename + ".json";
@@ -39,7 +37,7 @@ abstract class LangPartial {
                 throw new IllegalStateException(String.format("Could not find default lang file: %s", filepath));
             return element.getAsJsonObject();
         }
-        
+
     }
 
     static class Gen extends LangPartial {
@@ -57,7 +55,7 @@ abstract class LangPartial {
             preTask.run();
             return provider.get();
         }
-        
+
     }
-    
+
 }
