@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 
 import com.google.gson.JsonObject;
 import com.simibubi.create.foundation.ponder.PonderLocalization;
-import com.tterrag.registrate.fabric.GatherDataEvent;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import plus.dragons.createdragonlib.advancement.AdvancementHolder;
@@ -24,7 +23,7 @@ public class LangFactory {
     }
     
     /**
-     * Register the {@link LangMerger} instance to {@link GatherDataEvent}. <br>
+     * Register the {@link LangMerger} instance to {@link FabricDataGenerator}. <br>
      * Should be called in the mod's main class' constructor. <br>
      */
     public void datagen(final FabricDataGenerator datagen) {
