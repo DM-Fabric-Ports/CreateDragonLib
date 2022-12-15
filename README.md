@@ -1,13 +1,13 @@
 # Depend on it
-```
+```gradle
 repositories {
     maven {
-        // Maven of dragons.plus
-        url "https://maven.dragons.plus/Releases"
+        // Maven of jitpack.io
+        url "https://jitpack.io/"
     }
 }
 
 dependencies {
-    implementation fg.deobf("plus.dragons.createdragonlib:create_dragon_lib-${minecraft_version}:${create_dragon_lib_version}")
+    modImplementation include("com.github.DM-Fabric-Ports:CreateDragonLib:${project.dragon_lib_version}")
 }
 ```
